@@ -1,10 +1,10 @@
-"""Base class for deriving trainable modules"""
+"""Base class for deriving trainable modules."""
 
 # global
 import os
 import abc
 import copy
-from typing import Optional, List, Tuple, Dict
+from typing import Optional, Tuple, Dict
 
 # local
 import ivy
@@ -130,8 +130,10 @@ class Module(ModuleConverters, ModuleHelpers):
 
     def _fn_with_var_arg(self, fn, v_fn, /):
         """
-        Use v_fn to extract the variables and use the extracted variables
-        as inputs to the call function fn of the module.
+        Extract variables from `v_fn` and use it as inputs for `fn`.
+
+        Use `v_fn` to extract the variables and use the extracted
+        variables as inputs to the call function fn of the module.
         """
 
         def _fn_with_var_arg_wrapper(*a, **kw):
@@ -200,8 +202,7 @@ class Module(ModuleConverters, ModuleHelpers):
         """
         Extract the variables from the variables container v using the key
         orig_key_chain and reinstantiate the duplicate variables that were removed by
-        _remove_duplicate_variables in their correct locations using
-        keychain_mappings.
+        _remove_duplicate_variables in their correct locations using keychain_mappings.
 
         Parameters
         ----------
@@ -233,8 +234,8 @@ class Module(ModuleConverters, ModuleHelpers):
         self, keychain_mappings, /, *, key="", obj=None, _visited=None
     ):
         """
-        Wraps the call methods of the Module object by looping over all the items
-        within the module, wrapping the __call__ methods of all submodules using
+        Wrap the call methods of the Module object by looping over all the items within
+        the module, wrapping the __call__ methods of all submodules using
         _fn_with_var_arg.
 
         Parameters
@@ -328,9 +329,9 @@ class Module(ModuleConverters, ModuleHelpers):
 
         created_ids.cont_map(lambda x, kc: unique_callback(x, kc))
         vs_ids.cont_map(
-            lambda x, kc: unique_callback(x, kc)
-            if x not in ids
-            else found_dup_callback(x, kc)
+            lambda x, kc: (
+                unique_callback(x, kc) if x not in ids else found_dup_callback(x, kc)
+            )
         )
         for dup_kc in duplicate_keychains:
             vs = vs.cont_prune_key_chain(dup_kc)
@@ -374,8 +375,7 @@ class Module(ModuleConverters, ModuleHelpers):
     @abc.abstractmethod
     def _forward(self, *args, **kwargs):
         """
-        Forward pass of the layer,
-        called after handling the optional input variables.
+        Forward pass of the layer, called after handling the optional input variables.
 
         Raises
         ------
@@ -385,8 +385,7 @@ class Module(ModuleConverters, ModuleHelpers):
 
     def _forward_with_tracking(self, *args, **kwargs):
         """
-        Forward pass while optionally tracking submodule returns
-        and call order.
+        Forward pass while optionally tracking submodule returns and call order.
 
         Returns
         -------
@@ -406,8 +405,7 @@ class Module(ModuleConverters, ModuleHelpers):
 
     def _call(self, *args, v=None, **kwargs):
         """
-        The forward pass of the layer,
-        treating layer instance as callable function.
+        Compute forward pass of the layer, treating layer instance as callable function.
 
         Parameters
         ----------
@@ -661,50 +659,30 @@ class Module(ModuleConverters, ModuleHelpers):
 
     def show_graph(
         self,
-        *args,
-        v=None,
-        stateful: Optional[List] = None,
-        arg_stateful_idxs: Optional[List] = None,
-        kwarg_stateful_idxs: Optional[List] = None,
         randomness_factor: float = 0.1,
         save_to_disk: bool = False,
+        notebook: bool = False,
         with_edge_labels: bool = True,
         with_arg_labels: bool = True,
         with_output_labels: bool = True,
         output_connected_only: bool = True,
-        include_generators: bool = True,
-        array_caching: bool = True,
         highlight_subgraph: Optional[int] = None,
         fname: Optional[str] = None,
-        return_graph: bool = False,
-        **kwargs,
     ):
-        self(*args, v=v, **kwargs)  # for on call build modes
-        if not self._built:
-            self.build(*args, from_call=False, **kwargs)  # for explicit build modes
-        kwargs["v"] = ivy.default(v, self.v)
-        graph = ivy.show_graph(
-            self._call,
-            *args,
-            **kwargs,
-            stateful=stateful,
-            arg_stateful_idxs=arg_stateful_idxs,
-            kwarg_stateful_idxs=kwarg_stateful_idxs,
-            randomness_factor=randomness_factor,
+        if not ivy.exists(self._module_graph):
+            raise ValueError("You must compile the module to display the graph.")
+
+        return self._module_graph.show(
             save_to_disk=save_to_disk,
+            notebook=notebook,
             with_edge_labels=with_edge_labels,
             with_arg_labels=with_arg_labels,
             with_output_labels=with_output_labels,
             output_connected_only=output_connected_only,
-            include_generators=include_generators,
-            array_caching=array_caching,
+            randomness_factor=randomness_factor,
             highlight_subgraph=highlight_subgraph,
             fname=fname,
-            return_graph=return_graph,
         )
-
-        if return_graph:
-            return graph
 
     def compile(
         self,
@@ -713,8 +691,8 @@ class Module(ModuleConverters, ModuleHelpers):
         **compile_kwargs,
     ):
         """
-        Compile the `ivy.Module`'s `_unified_ivy_graph` or `_call` method to the
-        target backend.
+        Compile the `ivy.Module`'s `_unified_ivy_graph` or `_call` method to the target
+        backend.
 
         Parameters
         ----------
