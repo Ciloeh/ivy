@@ -19,8 +19,7 @@ class LayerNorm(Module):
         v=None,
         dtype=None,
     ):
-        """
-        Class for applying Layer Normalization over a mini-batch of inputs.
+        """Class for applying Layer Normalization over a mini-batch of inputs.
 
         Parameters
         ----------
@@ -28,7 +27,7 @@ class LayerNorm(Module):
             Trailing shape to applying the normalization to.
         epsilon
             small constant to add to the denominator,
-            use global ivy._MIN_BASE by default.
+            use global ivy.min_base by default.
         elementwise_affine
             Whether to include learnable affine parameters, default is ``True``.
         new_std
@@ -40,6 +39,8 @@ class LayerNorm(Module):
             the variables for each submodule in the sequence,
             constructed internally by default.
         """
+        if isinstance(normalized_shape, int):
+            normalized_shape = (normalized_shape,)
         self._normalized_idxs = [-(i + 1) for i in range(len(normalized_shape))]
         self._epsilon = eps
         self._elementwise_affine = elementwise_affine
@@ -50,8 +51,10 @@ class LayerNorm(Module):
         self._bias_init = Zeros()
         Module.__init__(self, device=device, v=v, dtype=dtype)
 
-    def _create_variables(self, device, dtype=None):
+    def _create_variables(self, device=None, dtype=None):
         """Create internal variables for the layer."""
+        device = ivy.default(device, self.device)
+        dtype = ivy.default(dtype, self.dtype)
         if self._elementwise_affine:
             return {
                 "weight": self._weight_init.create_variables(
@@ -64,8 +67,7 @@ class LayerNorm(Module):
         return {}
 
     def _forward(self, inputs):
-        """
-        Perform forward pass of the LayerNorm layer.
+        """Perform forward pass of the LayerNorm layer.
 
         Parameters
         ----------
@@ -86,6 +88,12 @@ class LayerNorm(Module):
             new_std=self._new_std,
         )
 
+    def _extra_repr(self) -> str:
+        return (
+            f"normalized_idxs={self._normalized_idxs}, epsilon={self._epsilon}, "
+            f"elementwise_affine={self._elementwise_affine}, new_std={self._new_std}"
+        )
+
 
 class BatchNorm2D(Module):
     def __init__(
@@ -100,11 +108,10 @@ class BatchNorm2D(Module):
         track_running_stats: bool = True,
         device=None,
         v=None,
-        training: bool = True,
         dtype=None,
+        training=True,
     ):
-        """
-        Class for applying Layer Normalization over a mini-batch of inputs.
+        """Class for applying Layer Normalization over a mini-batch of inputs.
 
         Parameters
         ----------
@@ -112,7 +119,7 @@ class BatchNorm2D(Module):
             Trailing shape to applying the normalization to.
         epsilon
             small constant to add to the denominator,
-            use global ivy._MIN_BASE by default.
+            use global ivy.min_base by default.
         data_format
             The ordering of the dimensions in the input, one of "NSC" or "NCS",
             where N is the batch dimension, S represents any number of spatial
@@ -138,7 +145,6 @@ class BatchNorm2D(Module):
         """
         self.num_features = num_features
         self._affine = affine
-        self.training = training
         self.data_format = data_format
         self._epsilon = eps
         self._momentum = momentum
@@ -151,10 +157,12 @@ class BatchNorm2D(Module):
         self._bias_init = Zeros()
         self._running_mean_init = Zeros()
         self._running_var_init = Ones()
-        Module.__init__(self, device=device, v=v, dtype=dtype)
+        Module.__init__(self, device=device, v=v, dtype=dtype, training=training)
 
-    def _create_variables(self, device, dtype=None):
+    def _create_variables(self, device=None, dtype=None):
         """Create internal variables for the layer."""
+        device = ivy.default(device, self.device)
+        dtype = ivy.default(dtype, self.dtype)
         if self._affine:
             return {
                 "b": self._bias_init.create_variables(
@@ -173,8 +181,7 @@ class BatchNorm2D(Module):
         return {}
 
     def _forward(self, inputs):
-        """
-        Perform forward pass of the BatchNorm layer.
+        """Perform forward pass of the BatchNorm layer.
 
         Parameters
         ----------
@@ -197,8 +204,16 @@ class BatchNorm2D(Module):
             scale=self.v.w if self._affine else None,
             offset=self.v.b if self._affine else None,
         )
-        if self._track_running_stats:
+        if self._track_running_stats and self.training:
             self.v.running_mean = running_mean
             self.v.running_var = running_var
 
         return normalized
+
+    def _extra_repr(self) -> str:
+        return (
+            f"num_features={self._num_features}, affine={self._affine}, "
+            f"data_format={self._data_format}, epsilon={self._epsilon} "
+            f"momentum={self._momentum}, "
+            f"track_running_stats={self._track_running_stats}"
+        )

@@ -4,7 +4,7 @@ import tensorflow as tf
 
 # local
 import ivy
-from ivy.func_wrapper import with_unsupported_dtypes
+from ivy.func_wrapper import with_unsupported_dtypes, with_supported_dtypes
 from ivy import promote_types_of_inputs
 from . import backend_version
 
@@ -13,17 +13,16 @@ def abs(
     x: Union[float, tf.Tensor, tf.Variable],
     /,
     *,
-    where: Union[bool, tf.Tensor, tf.Variable] = True,
     out: Optional[Union[tf.Tensor, tf.Variable]] = None,
 ) -> Union[tf.Tensor, tf.Variable]:
     if not tf.is_tensor(x):
         x = tf.convert_to_tensor(x)
-    x_dtype = ivy.dtype(x)
-    if any(("uint" in x_dtype, "bool" in x_dtype)):
+    if any(("uint" in x.dtype.name, "bool" in x.dtype.name)):
         return x
-    return ivy.where(where, tf.abs(x), x)
+    return tf.abs(x)
 
 
+@with_unsupported_dtypes({"2.15.0 and below": ("unsigned", "bool")}, backend_version)
 def acos(
     x: Union[tf.Tensor, tf.Variable],
     /,
@@ -51,6 +50,8 @@ def add(
     out: Optional[Union[tf.Tensor, tf.Variable]] = None,
 ) -> Union[tf.Tensor, tf.Variable]:
     x1, x2 = ivy.promote_types_of_inputs(x1, x2)
+    if x1.dtype.is_bool and x2.dtype.is_bool:
+        return tf.math.logical_or(x1, x2)
     if alpha not in (1, None):
         with ivy.ArrayMode(False):
             x2 = multiply(x2, alpha)
@@ -84,7 +85,7 @@ def atan(
     return tf.math.atan(x)
 
 
-@with_unsupported_dtypes({"2.12.0 and below": ("complex",)}, backend_version)
+@with_unsupported_dtypes({"2.15.0 and below": ("complex",)}, backend_version)
 def atan2(
     x1: Union[tf.Tensor, tf.Variable],
     x2: Union[tf.Tensor, tf.Variable],
@@ -105,7 +106,7 @@ def atanh(
     return tf.math.atanh(x)
 
 
-@with_unsupported_dtypes({"2.12.0 and below": ("complex",)}, backend_version)
+@with_unsupported_dtypes({"2.15.0 and below": ("complex",)}, backend_version)
 def bitwise_and(
     x1: Union[int, tf.Tensor, tf.Variable],
     x2: Union[int, tf.Tensor, tf.Variable],
@@ -120,7 +121,7 @@ def bitwise_and(
         return tf.bitwise.bitwise_and(x1, x2)
 
 
-@with_unsupported_dtypes({"2.12.0 and below": ("complex",)}, backend_version)
+@with_unsupported_dtypes({"2.15.0 and below": ("complex",)}, backend_version)
 def bitwise_invert(
     x: Union[int, tf.Tensor, tf.Variable],
     /,
@@ -133,7 +134,7 @@ def bitwise_invert(
         return tf.bitwise.invert(x)
 
 
-@with_unsupported_dtypes({"2.12.0 and below": ("complex",)}, backend_version)
+@with_unsupported_dtypes({"2.15.0 and below": ("complex",)}, backend_version)
 def bitwise_left_shift(
     x1: Union[int, tf.Tensor, tf.Variable],
     x2: Union[int, tf.Tensor, tf.Variable],
@@ -145,7 +146,7 @@ def bitwise_left_shift(
     return tf.bitwise.left_shift(x1, x2)
 
 
-@with_unsupported_dtypes({"2.12.0 and below": ("complex",)}, backend_version)
+@with_unsupported_dtypes({"2.15.0 and below": ("complex",)}, backend_version)
 def bitwise_or(
     x1: Union[int, tf.Tensor, tf.Variable],
     x2: Union[int, tf.Tensor, tf.Variable],
@@ -160,7 +161,7 @@ def bitwise_or(
         return tf.bitwise.bitwise_or(x1, x2)
 
 
-@with_unsupported_dtypes({"2.12.0 and below": ("complex",)}, backend_version)
+@with_unsupported_dtypes({"2.15.0 and below": ("complex",)}, backend_version)
 def bitwise_right_shift(
     x1: Union[int, tf.Tensor, tf.Variable],
     x2: Union[int, tf.Tensor, tf.Variable],
@@ -172,7 +173,7 @@ def bitwise_right_shift(
     return tf.bitwise.right_shift(x1, x2)
 
 
-@with_unsupported_dtypes({"2.12.0 and below": ("complex",)}, backend_version)
+@with_unsupported_dtypes({"2.15.0 and below": ("complex",)}, backend_version)
 def bitwise_xor(
     x1: Union[int, tf.Tensor, tf.Variable],
     x2: Union[int, tf.Tensor, tf.Variable],
@@ -187,7 +188,7 @@ def bitwise_xor(
         return tf.bitwise.bitwise_xor(x1, x2)
 
 
-@with_unsupported_dtypes({"2.12.0 and below": ("complex",)}, backend_version)
+@with_unsupported_dtypes({"2.15.0 and below": ("complex",)}, backend_version)
 def ceil(
     x: Union[tf.Tensor, tf.Variable],
     /,
@@ -200,6 +201,7 @@ def ceil(
         return tf.math.ceil(x)
 
 
+@with_unsupported_dtypes({"2.15.0 and below": ("integer",)}, backend_version)
 def cos(
     x: Union[tf.Tensor, tf.Variable],
     /,
@@ -209,7 +211,7 @@ def cos(
     return tf.cos(x)
 
 
-@with_unsupported_dtypes({"2.12.0 and below": ("float16",)}, backend_version)
+@with_unsupported_dtypes({"2.15.0 and below": ("float16",)}, backend_version)
 def cosh(
     x: Union[tf.Tensor, tf.Variable],
     /,
@@ -246,6 +248,7 @@ def equal(
     return tf.math.equal(x1, x2)
 
 
+@with_unsupported_dtypes({"2.15.0 and below": ("integer",)}, backend_version)
 def exp(
     x: Union[tf.Tensor, tf.Variable],
     /,
@@ -255,6 +258,16 @@ def exp(
     return tf.math.exp(x)
 
 
+def exp2(
+    x: Union[tf.Tensor, tf.Variable, float, list, tuple],
+    /,
+    *,
+    out: Optional[Union[tf.Tensor, tf.Variable]] = None,
+) -> Union[tf.Tensor, tf.Variable]:
+    return tf.math.pow(2, x, name=None)
+
+
+@with_supported_dtypes({"2.15.0 and below": ("float", "complex")}, backend_version)
 def expm1(
     x: Union[tf.Tensor, tf.Variable],
     /,
@@ -264,7 +277,7 @@ def expm1(
     return tf.math.expm1(x)
 
 
-@with_unsupported_dtypes({"2.12.0 and below": ("complex",)}, backend_version)
+@with_unsupported_dtypes({"2.15.0 and below": ("complex",)}, backend_version)
 def floor(
     x: Union[tf.Tensor, tf.Variable],
     /,
@@ -277,7 +290,7 @@ def floor(
         return tf.math.floor(x)
 
 
-@with_unsupported_dtypes({"2.12.0 and below": ("complex",)}, backend_version)
+@with_unsupported_dtypes({"2.15.0 and below": ("complex",)}, backend_version)
 def floor_divide(
     x1: Union[float, tf.Tensor, tf.Variable],
     x2: Union[float, tf.Tensor, tf.Variable],
@@ -289,7 +302,22 @@ def floor_divide(
     return tf.experimental.numpy.floor_divide(x1, x2)
 
 
-@with_unsupported_dtypes({"2.12.0 and below": ("complex",)}, backend_version)
+@with_supported_dtypes({"2.15.0 and below": ("float",)}, backend_version)
+def fmin(
+    x1: Union[tf.Tensor, tf.Variable],
+    x2: Union[tf.Tensor, tf.Variable],
+    /,
+    *,
+    out: Optional[Union[tf.Tensor, tf.Variable]] = None,
+) -> Union[tf.Tensor, tf.Variable]:
+    x1, x2 = promote_types_of_inputs(x1, x2)
+    x1 = tf.where(tf.math.is_nan(x1), x2, x1)
+    x2 = tf.where(tf.math.is_nan(x2), x1, x2)
+    ret = tf.experimental.numpy.minimum(x1, x2)
+    return ret
+
+
+@with_unsupported_dtypes({"2.15.0 and below": ("complex",)}, backend_version)
 def greater(
     x1: Union[float, tf.Tensor, tf.Variable],
     x2: Union[float, tf.Tensor, tf.Variable],
@@ -298,10 +326,10 @@ def greater(
     out: Optional[Union[tf.Tensor, tf.Variable]] = None,
 ) -> Union[tf.Tensor, tf.Variable]:
     x1, x2 = ivy.promote_types_of_inputs(x1, x2)
-    return tf.math.greater(x1, x2)
+    return tf.experimental.numpy.greater(x1, x2)
 
 
-@with_unsupported_dtypes({"2.12.0 and below": ("complex",)}, backend_version)
+@with_unsupported_dtypes({"2.15.0 and below": ("complex",)}, backend_version)
 def greater_equal(
     x1: Union[float, tf.Tensor, tf.Variable],
     x2: Union[float, tf.Tensor, tf.Variable],
@@ -321,11 +349,14 @@ def isfinite(
 ) -> Union[tf.Tensor, tf.Variable]:
     if ivy.is_int_dtype(x):
         return tf.ones_like(x, tf.bool)
+    elif ivy.is_complex_dtype(x):
+        return tf.math.logical_and(
+            tf.math.is_finite(tf.math.real(x)), tf.math.is_finite(tf.math.imag(x))
+        )
     else:
         return tf.math.is_finite(x)
 
 
-@with_unsupported_dtypes({"2.12.0 and below": ("complex",)}, backend_version)
 def isinf(
     x: Union[tf.Tensor, tf.Variable],
     /,
@@ -334,19 +365,20 @@ def isinf(
     detect_negative: bool = True,
     out: Optional[Union[tf.Tensor, tf.Variable]] = None,
 ) -> Union[tf.Tensor, tf.Variable]:
-    if ivy.is_int_dtype(x):
-        return tf.zeros_like(x, tf.bool)
-    else:
-        if detect_negative and detect_positive:
-            return tf.math.is_inf(x)
-        elif detect_negative:
-            return tf.experimental.numpy.isneginf(x)
-        elif detect_positive:
-            return tf.experimental.numpy.isposinf(x)
-        return tf.zeros_like(x, tf.bool)
+    if not ivy.is_complex_dtype(x):
+        if ivy.is_int_dtype(x):
+            return tf.zeros_like(x, tf.bool)
+        else:
+            if detect_negative and detect_positive:
+                return tf.math.is_inf(x)
+            elif detect_negative:
+                return tf.experimental.numpy.isneginf(x)
+            elif detect_positive:
+                return tf.experimental.numpy.isposinf(x)
+    return tf.zeros_like(x, tf.bool)
 
 
-@with_unsupported_dtypes({"2.12.0 and below": ("complex",)}, backend_version)
+@with_unsupported_dtypes({"2.15.0 and below": ("complex", "bool")}, backend_version)
 def isnan(
     x: Union[tf.Tensor, tf.Variable],
     /,
@@ -359,7 +391,7 @@ def isnan(
         return tf.math.is_nan(x)
 
 
-@with_unsupported_dtypes({"2.12.0 and below": ("unsigned",)}, backend_version)
+@with_unsupported_dtypes({"2.15.0 and below": ("unsigned",)}, backend_version)
 def lcm(
     x1: Union[tf.Tensor, tf.Variable],
     x2: Union[tf.Tensor, tf.Variable],
@@ -368,10 +400,18 @@ def lcm(
     out: Optional[Union[tf.Tensor, tf.Variable]] = None,
 ) -> Union[tf.Tensor, tf.Variable]:
     x1, x2 = promote_types_of_inputs(x1, x2)
-    return tf.math.abs(tf.experimental.numpy.lcm(x1, x2))
+    return tf.experimental.numpy.lcm(x1, x2)
 
 
-@with_unsupported_dtypes({"2.12.0 and below": ("complex",)}, backend_version)
+@with_unsupported_dtypes(
+    {
+        "2.15.0 and below": (
+            "bool",
+            "complex",
+        )
+    },
+    backend_version,
+)
 def less(
     x1: Union[float, tf.Tensor, tf.Variable],
     x2: Union[float, tf.Tensor, tf.Variable],
@@ -383,7 +423,7 @@ def less(
     return tf.math.less(x1, x2)
 
 
-@with_unsupported_dtypes({"2.12.0 and below": ("complex",)}, backend_version)
+@with_unsupported_dtypes({"2.15.0 and below": ("complex",)}, backend_version)
 def less_equal(
     x1: Union[float, tf.Tensor, tf.Variable],
     x2: Union[float, tf.Tensor, tf.Variable],
@@ -395,6 +435,9 @@ def less_equal(
     return tf.math.less_equal(x1, x2)
 
 
+@with_unsupported_dtypes(
+    {"2.15.0 and below": ("float16", "bfloat16", "integer")}, backend_version
+)
 def log(
     x: Union[tf.Tensor, tf.Variable],
     /,
@@ -431,7 +474,7 @@ def log2(
     return tf.math.log(x) / tf.math.log(tf.constant(2.0, x.dtype))
 
 
-@with_unsupported_dtypes({"2.12.0 and below": ("float16", "bfloat16")}, backend_version)
+@with_unsupported_dtypes({"2.15.0 and below": ("float16", "bfloat16")}, backend_version)
 def logaddexp(
     x1: Union[tf.Tensor, tf.Variable],
     x2: Union[tf.Tensor, tf.Variable],
@@ -439,13 +482,53 @@ def logaddexp(
     *,
     out: Optional[Union[tf.Tensor, tf.Variable]] = None,
 ) -> Union[tf.Tensor, tf.Variable]:
-    # ToDo: implement using tf.experimental.numpy.logaddexp if this becomes stable and
-    # supports gradients in future
     x1, x2 = ivy.promote_types_of_inputs(x1, x2)
-    dtype = x1.dtype
-    x1 = tf.cast(x1, tf.float64)
-    x2 = tf.cast(x2, tf.float64)
-    return ivy.log(ivy.add(ivy.exp(x1), ivy.exp(x2))).astype(dtype)
+    return tf.experimental.numpy.logaddexp(x1, x2)
+
+
+@with_unsupported_dtypes({"2.15.0 and below": ("float16",)}, backend_version)
+def real(
+    x: Union[tf.Tensor, tf.Variable],
+    /,
+    *,
+    out: Optional[Union[tf.Tensor, tf.Variable]] = None,
+) -> Union[tf.Tensor, tf.Variable]:
+    return tf.math.real(x)
+
+
+@with_unsupported_dtypes(
+    {
+        "2.15.0 and below": (
+            "uint8",
+            "uint16",
+            "uint32",
+            "uint64",
+            "int8",
+            "int16",
+            "int32",
+            "int64",
+        )
+    },
+    backend_version,
+)
+def logaddexp2(
+    x1: Union[tf.Tensor, tf.Variable, float, list, tuple],
+    x2: Union[tf.Tensor, tf.Variable, float, list, tuple],
+    /,
+    *,
+    out: Optional[Union[tf.Tensor, tf.Variable]] = None,
+) -> Union[tf.Tensor, tf.Variable]:
+    x1, x2 = promote_types_of_inputs(x1, x2)
+    if not ivy.is_float_dtype(x1):
+        x1 = tf.cast(x1, ivy.default_float_dtype(as_native=True))
+        x2 = tf.cast(x2, ivy.default_float_dtype(as_native=True))
+    amax = ivy.maximum(x1, x2)
+    delta = x1 - x2
+    return ivy.where(
+        ivy.isnan(delta),
+        x1 + x2,
+        amax + ivy.log1p(ivy.exp2(-ivy.abs(delta))) / ivy.log(2.0).astype(amax.dtype),
+    )
 
 
 def logical_and(
@@ -487,6 +570,7 @@ def logical_xor(
     return tf.math.logical_xor(tf.cast(x1, tf.bool), tf.cast(x2, tf.bool))
 
 
+@with_unsupported_dtypes({"2.15.0 and below": ("bool",)}, backend_version)
 def multiply(
     x1: Union[float, tf.Tensor, tf.Variable],
     x2: Union[float, tf.Tensor, tf.Variable],
@@ -498,17 +582,13 @@ def multiply(
     return tf.math.multiply(x1, x2)
 
 
-@with_unsupported_dtypes(
-    {"2.12.0 and below": ("uint8", "uint16", "uint32", "uint64")}, backend_version
-)
+@with_unsupported_dtypes({"2.15.0 and below": ("bool", "unsigned")}, backend_version)
 def negative(
     x: Union[float, tf.Tensor, tf.Variable],
     /,
     *,
     out: Optional[Union[tf.Tensor, tf.Variable]] = None,
 ) -> Union[tf.Tensor, tf.Variable]:
-    if x.dtype in [tf.uint8, tf.uint16, tf.uint32, tf.uint64]:
-        return tf.cast(tf.negative(tf.cast(x, tf.float32)), x.dtype)
     return tf.negative(x)
 
 
@@ -532,30 +612,32 @@ def positive(
     return tf.experimental.numpy.positive(x)
 
 
-@with_unsupported_dtypes(
-    {"2.12.0 and below": ("uint8", "uint16", "uint32", "uint64", "float64")},
-    backend_version,
-)
+@with_unsupported_dtypes({"2.15.0 and below": ("bool", "unsigned")}, backend_version)
 def pow(
-    x1: Union[float, tf.Tensor, tf.Variable],
-    x2: Union[float, tf.Tensor, tf.Variable],
+    x1: Union[tf.Tensor, tf.Variable],
+    x2: Union[int, float, tf.Tensor, tf.Variable],
     /,
     *,
     out: Optional[Union[tf.Tensor, tf.Variable]] = None,
 ) -> Union[tf.Tensor, tf.Variable]:
+    if ivy.is_complex_dtype(x1) and ivy.any(ivy.isinf(x2)):
+        ret = tf.experimental.numpy.power(x1, x2)
+        return tf.where(
+            ivy.isinf(x2), ivy.nan + ivy.nan * 1j if x2 < 0 else -0 * 1j, ret
+        )
+    if ivy.is_complex_dtype(x2) and ivy.any(x1 == 0):
+        ret = tf.experimental.numpy.power(x1, x2)
+        return tf.where(x1 == 0, ivy.nan + ivy.nan * 1j, ret)
     x1, x2 = ivy.promote_types_of_inputs(x1, x2)
-    if isinstance(x1, tf.Tensor) and isinstance(x2, tf.Tensor):
-        if x1.dtype.is_unsigned or x2.dtype.is_unsigned:
-            promoted_type = tf.experimental.numpy.promote_types(x1.dtype, x2.dtype)
-            if x1.dtype.is_unsigned:
-                x1 = tf.cast(x1, tf.float64)
-            if x2.dtype.is_unsigned:
-                x2 = tf.cast(x2, tf.float64)
-            return tf.cast(tf.experimental.numpy.power(x1, x2), promoted_type)
+    if ivy.is_int_dtype(x1) and ivy.any(x2 < 0):
+        return tf.cast(
+            tf.experimental.numpy.power(tf.cast(x1, tf.float32), x2),
+            x1.dtype,
+        )
     return tf.experimental.numpy.power(x1, x2)
 
 
-@with_unsupported_dtypes({"2.12.0 and below": ("bfloat16", "complex")}, backend_version)
+@with_unsupported_dtypes({"2.15.0 and below": ("bfloat16", "complex")}, backend_version)
 def remainder(
     x1: Union[float, tf.Tensor, tf.Variable],
     x2: Union[float, tf.Tensor, tf.Variable],
@@ -574,7 +656,7 @@ def remainder(
     return tf.experimental.numpy.remainder(x1, x2)
 
 
-@with_unsupported_dtypes({"2.12.0 and below": ("bfloat16", "complex")}, backend_version)
+@with_unsupported_dtypes({"2.15.0 and below": ("bfloat16", "complex")}, backend_version)
 def round(
     x: Union[tf.Tensor, tf.Variable],
     /,
@@ -595,14 +677,14 @@ def round(
         return tf.cast(tf.round(x * factor) / factor_deno, ret_dtype)
 
 
+@with_unsupported_dtypes({"2.15.0 and below": ("bool", "unsigned")}, backend_version)
 def sign(
     x: Union[tf.Tensor, tf.Variable],
     /,
     *,
+    np_variant: Optional[bool] = True,
     out: Optional[Union[tf.Tensor, tf.Variable]] = None,
 ) -> Union[tf.Tensor, tf.Variable]:
-    if x.dtype in [tf.uint8, tf.uint16, tf.uint32, tf.uint64]:
-        return tf.cast(tf.math.sign(tf.cast(x, tf.float32)), x.dtype)
     return tf.math.sign(x)
 
 
@@ -671,12 +753,26 @@ def tanh(
     x: Union[tf.Tensor, tf.Variable],
     /,
     *,
+    complex_mode="jax",
     out: Optional[Union[tf.Tensor, tf.Variable]] = None,
 ) -> Union[tf.Tensor, tf.Variable]:
-    return tf.tanh(x)
+    return tf.math.tanh(x)
 
 
-@with_unsupported_dtypes({"2.12.0 and below": ("complex",)}, backend_version)
+def trapz(
+    y: Union[tf.Tensor, tf.Variable],
+    /,
+    *,
+    x: Optional[Union[tf.Tensor, tf.Variable]] = None,
+    dx: float = 1.0,
+    axis: int = -1,
+    out: Optional[Union[tf.Tensor, tf.Variable]] = None,
+) -> Union[tf.Tensor, tf.Variable]:
+    pass
+    # TODO: Implement purely in tensorflow
+
+
+@with_unsupported_dtypes({"2.15.0 and below": ("complex",)}, backend_version)
 def trunc(
     x: Union[tf.Tensor, tf.Variable],
     /,
@@ -686,8 +782,8 @@ def trunc(
     ret = x
     if not ivy.is_array(x):
         raise ivy.utils.exceptions.IvyException("Input must be array")
-    elif not ("int" in str(x.dtype)):
-        if not ret.get_shape().ndims == 0:
+    elif "int" not in str(x.dtype):
+        if ret.get_shape().ndims != 0:
             ret = tf.tensor_scatter_nd_update(
                 x, tf.where(tf.greater_equal(x, 0)), tf.math.floor(x[x >= 0])
             )
@@ -703,7 +799,7 @@ def trunc(
 # ------#
 
 
-@with_unsupported_dtypes({"2.12.0 and below": ("complex",)}, backend_version)
+@with_unsupported_dtypes({"2.15.0 and below": ("complex",)}, backend_version)
 def erf(
     x: Union[tf.Tensor, tf.Variable],
     /,
@@ -713,18 +809,7 @@ def erf(
     return tf.math.erf(x)
 
 
-@with_unsupported_dtypes(
-    {
-        "2.12.0 and below": (
-            "uint8",
-            "uint16",
-            "uint32",
-            "uint64",
-            "complex",
-        )
-    },
-    backend_version,
-)
+@with_unsupported_dtypes({"2.15.0 and below": ("complex", "bool")}, backend_version)
 def maximum(
     x1: Union[tf.Tensor, tf.Variable],
     x2: Union[tf.Tensor, tf.Variable],
@@ -734,26 +819,10 @@ def maximum(
     out: Optional[Union[tf.Tensor, tf.Variable]] = None,
 ) -> Union[tf.Tensor, tf.Variable]:
     x1, x2 = ivy.promote_types_of_inputs(x1, x2)
-    dtype = x1.dtype
-    if use_where:
-        return tf.math.maximum(x1, x2)
-    x1 = tf.cast(x1, tf.float64)
-    x2 = tf.cast(x2, tf.float64)
-    return tf.cast((x1 + x2 + tf.math.abs(x1 - x2)) / 2, dtype=dtype)
+    return tf.math.maximum(x1, x2)
 
 
-@with_unsupported_dtypes(
-    {
-        "2.12.0 and below": (
-            "uint8",
-            "uint16",
-            "uint32",
-            "uint64",
-            "complex",
-        )
-    },
-    backend_version,
-)
+@with_unsupported_dtypes({"2.15.0 and below": ("complex", "bool")}, backend_version)
 def minimum(
     x1: Union[tf.Tensor, tf.Variable],
     x2: Union[tf.Tensor, tf.Variable],
@@ -763,17 +832,12 @@ def minimum(
     out: Optional[Union[tf.Tensor, tf.Variable]] = None,
 ) -> Union[tf.Tensor, tf.Variable]:
     x1, x2 = ivy.promote_types_of_inputs(x1, x2)
-    dtype = x1.dtype
-    if use_where:
-        return tf.math.minimum(x1, x2)
-    x1 = tf.cast(x1, tf.float64)
-    x2 = tf.cast(x2, tf.float64)
-    return tf.cast((x1 + x2 - tf.math.abs(x1 - x2)) / 2, dtype)
+    return tf.math.minimum(x1, x2)
 
 
 @with_unsupported_dtypes(
     {
-        "2.12.0 and below": (
+        "2.15.0 and below": (
             "uint8",
             "uint16",
             "uint32",
@@ -792,19 +856,23 @@ def reciprocal(
     *,
     out: Optional[Union[tf.Tensor, tf.Variable]] = None,
 ) -> Union[tf.Tensor, tf.Variable]:
+    if x.dtype.is_integer:
+        x = tf.cast(x, tf.float32)
     return tf.math.reciprocal(x)
 
 
-@with_unsupported_dtypes({"2.12.0 and below": ("bfloat16",)}, backend_version)
+@with_supported_dtypes({"2.15.0 and below": ("float",)}, backend_version)
 def deg2rad(
     x: Union[tf.Tensor, tf.Variable],
     /,
     *,
     out: Optional[Union[tf.Tensor, tf.Variable]] = None,
 ) -> Union[tf.Tensor, tf.Variable]:
-    return tf.experimental.numpy.deg2rad(x)
+    radians = x * ivy.pi / 180.0
+    return radians
 
 
+@with_supported_dtypes({"2.15.0 and below": ("float",)}, backend_version)
 def rad2deg(
     x: Union[tf.Tensor, tf.Variable],
     /,
@@ -824,7 +892,8 @@ def isreal(
 
 
 @with_unsupported_dtypes(
-    {"2.12.0 and below": ("unsigned", "complex", "bool")}, backend_version
+    {"2.15.0 and below": ("uint8", "uint16", "uint32", "uint64", "complex", "bool")},
+    backend_version,
 )
 def fmod(
     x1: Union[tf.Tensor, tf.Variable],
@@ -834,5 +903,96 @@ def fmod(
     out: Optional[Union[tf.Tensor, tf.Variable]] = None,
 ) -> Union[tf.Tensor, tf.Variable]:
     x1, x2 = promote_types_of_inputs(x1, x2)
+    # tf.math.floormod returns wrong results
     res = tf.experimental.numpy.remainder(tf.math.abs(x1), tf.math.abs(x2))
     return tf.where(x1 < 0, -res, res)
+
+
+@with_unsupported_dtypes(
+    {"2.15.0 and below": ("uint8", "uint16", "uint32", "uint64")}, backend_version
+)
+def gcd(
+    x1: Union[tf.Tensor, tf.Variable, int, list, tuple],
+    x2: Union[tf.Tensor, tf.Variable, float, list, tuple],
+    /,
+    *,
+    out: Optional[Union[tf.Tensor, tf.Variable]] = None,
+) -> Union[tf.Tensor, tf.Variable]:
+    x1, x2 = promote_types_of_inputs(x1, x2)
+    return tf.experimental.numpy.gcd(x1, x2)
+
+
+gcd.support_native_out = False
+
+
+@with_unsupported_dtypes(
+    {
+        "2.15.0 and below": (
+            "uint8",
+            "uint16",
+            "uint32",
+            "uint64",
+            "bfloat16",
+            "int32",
+        )
+    },
+    backend_version,
+)
+def angle(
+    input: Union[tf.Tensor, tf.Variable],
+    /,
+    *,
+    deg: Optional[bool] = None,
+    out: Optional[Union[tf.Tensor, tf.Variable]] = None,
+) -> Union[tf.Tensor, tf.Variable]:
+    if deg:
+        return tf.math.angle(input, name=None) * (180 / tf.experimental.numpy.pi)
+    else:
+        return tf.math.angle(input, name=None)
+
+
+@with_unsupported_dtypes(
+    {
+        "2.15.0 and below": (
+            "uint8",
+            "uint16",
+            "uint32",
+            "uint64",
+            "bfloat16",
+            "int32",
+        )
+    },
+    backend_version,
+)
+def imag(
+    val: Union[tf.Tensor, tf.Variable],
+    /,
+    *,
+    out: Optional[Union[tf.Tensor, tf.Variable]] = None,
+) -> Union[tf.Tensor, tf.Variable]:
+    return tf.math.imag(val, name=None)
+
+
+def nan_to_num(
+    x: Union[tf.Tensor, tf.Variable],
+    /,
+    *,
+    copy: bool = True,
+    nan: Union[float, int] = 0.0,
+    posinf: Optional[Union[float, int]] = None,
+    neginf: Optional[Union[float, int]] = None,
+    out: Optional[Union[tf.Tensor, tf.Variable]] = None,
+) -> Union[tf.Tensor, tf.Variable]:
+    posinf = posinf if posinf is not None else x.dtype.max
+    neginf = neginf if neginf is not None else x.dtype.min
+    posinf = tf.constant(posinf, x.dtype)
+    neginf = tf.constant(neginf, x.dtype)
+    nan = tf.constant(nan, x.dtype)
+    ret = tf.where(tf.math.is_nan(x), nan, x)
+    ret = tf.where(tf.math.logical_and(tf.math.is_inf(ret), ret > 0), posinf, ret)
+    ret = tf.where(tf.math.logical_and(tf.math.is_inf(ret), ret < 0), neginf, ret)
+    if copy:
+        return ret
+    else:
+        x = ret
+        return x

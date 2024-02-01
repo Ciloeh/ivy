@@ -1,4 +1,5 @@
 # global
+
 import abc
 from typing import Union, Optional, Literal, Tuple, List, Sequence
 
@@ -20,10 +21,9 @@ class _ArrayWithLinearAlgebra(abc.ABC):
         adjoint_b: bool = False,
         out: Optional[ivy.Array] = None,
     ) -> ivy.Array:
-        """
-        ivy.Array instance method variant of ivy.matmul. This method simply wraps the
-        function, and so the docstring for ivy.matmul also applies to this method with
-        minimal changes.
+        """ivy.Array instance method variant of ivy.matmul. This method simply
+        wraps the function, and so the docstring for ivy.matmul also applies to
+        this method with minimal changes.
 
         Parameters
         ----------
@@ -81,10 +81,9 @@ class _ArrayWithLinearAlgebra(abc.ABC):
         upper: bool = False,
         out: Optional[ivy.Array] = None,
     ) -> ivy.Array:
-        """
-        ivy.Array instance method variant of ivy.cholesky. This method simply wraps the
-        function, and so the docstring for ivy.cholesky also applies to this method with
-        minimal changes.
+        """ivy.Array instance method variant of ivy.cholesky. This method
+        simply wraps the function, and so the docstring for ivy.cholesky also
+        applies to this method with minimal changes.
 
         Parameters
         ----------
@@ -134,10 +133,9 @@ class _ArrayWithLinearAlgebra(abc.ABC):
         axis: int = -1,
         out: Optional[ivy.Array] = None,
     ) -> ivy.Array:
-        """
-        ivy.Array instance method variant of ivy.cross. This method simply wraps the
-        function, and so the docstring for ivy.cross also applies to this method with
-        minimal changes.
+        """ivy.Array instance method variant of ivy.cross. This method simply
+        wraps the function, and so the docstring for ivy.cross also applies to
+        this method with minimal changes.
 
         Parameters
         ----------
@@ -193,10 +191,9 @@ class _ArrayWithLinearAlgebra(abc.ABC):
         axis2: int = -1,
         out: Optional[ivy.Array] = None,
     ) -> ivy.Array:
-        """
-        ivy.Array instance method variant of ivy.diagonal. This method simply wraps the
-        function, and so the docstring for ivy.diagonal also applies to this method with
-        minimal changes.
+        """ivy.Array instance method variant of ivy.diagonal. This method
+        simply wraps the function, and so the docstring for ivy.diagonal also
+        applies to this method with minimal changes.
 
         Parameters
         ----------
@@ -273,10 +270,9 @@ class _ArrayWithLinearAlgebra(abc.ABC):
         k: int = 0,
         out: Optional[ivy.Array] = None,
     ) -> ivy.Array:
-        """
-        ivy.Array instance method variant of ivy.diag. This method simply wraps the
-        function, and so the docstring for ivy.diag also applies to this method with
-        minimal changes.
+        """ivy.Array instance method variant of ivy.diag. This method simply
+        wraps the function, and so the docstring for ivy.diag also applies to
+        this method with minimal changes.
 
         Examples
         --------
@@ -312,10 +308,9 @@ class _ArrayWithLinearAlgebra(abc.ABC):
         UPLO: str = "L",
         out: Optional[ivy.Array] = None,
     ) -> ivy.Array:
-        """
-        ivy.Array instance method variant of ivy.eigvalsh. This method simply wraps the
-        function, and so the docstring for ivy.eigvalsh also applies to this method with
-        minimal changes.
+        """ivy.Array instance method variant of ivy.eigvalsh. This method
+        simply wraps the function, and so the docstring for ivy.eigvalsh also
+        applies to this method with minimal changes.
 
         Parameters
         ----------
@@ -323,24 +318,25 @@ class _ArrayWithLinearAlgebra(abc.ABC):
             input array having shape (..., M, M) and whose innermost two dimensions form
             square matrices. Must have floating-point data type.
         out
-            optional output array, for writing the result to. It must have a shape that the
-            inputs broadcast to.
+            optional output array, for writing the result to. It must have a shape that
+            the inputs broadcast to.
 
         Returns
         -------
         ret
-            an array containing the computed eigenvalues. The returned array must have shape
-            (..., M) and have the same data type as x.
+            an array containing the computed eigenvalues. The returned array must have
+            shape (..., M) and have the same data type as x.
 
 
         This function conforms to the `Array API Standard
-        <https://data-apis.org/array-api/latest/>`_. This docstring is an extension of the
-        `docstring <https://data-apis.org/array-api/latest/extensions/generated/signatures.linalg.eigvalsh.html>`_ # noqa
+        <https://data-apis.org/array-api/latest/>`_. This docstring is an extension of
+        the `docstring <https://data-apis.org/array-api/latest/
+        extensions/generated/array_api.linalg.eigvalsh.html>`_
         in the standard.
 
-        Both the description and the type hints above assumes an array input for simplicity,
-        but this function is *nestable*, and therefore also accepts :class:`ivy.Container`
-        instances in place of any of the arguments.
+        Both the description and the type hints above assumes an array input for
+        simplicity, but this function is *nestable*, and therefore also
+        accepts :class:`ivy.Container` instances in place of any of the arguments.
 
         Examples
         --------
@@ -360,15 +356,67 @@ class _ArrayWithLinearAlgebra(abc.ABC):
         *,
         out: Optional[ivy.Array] = None,
     ) -> ivy.Array:
+        """Return the inner product of two vectors ``self`` and ``x2``.
+
+        Parameters
+        ----------
+        self
+            first one-dimensional input array of size N.
+            Should have a numeric data type.
+            a(N,) array_like
+            First input vector. Input is flattened if not already 1-dimensional.
+        x2
+            second one-dimensional input array of size M.
+            Should have a numeric data type.
+            b(M,) array_like
+            Second input vector. Input is flattened if not already 1-dimensional.
+        out
+            optional output array, for writing the result to.
+            It must have a shape that the inputs broadcast to.
+
+        Returns
+        -------
+        ret
+            a two-dimensional array containing the inner product and whose
+            shape is (N, M).
+            The returned array must have a data type determined by Type Promotion Rules.
+
+        Examples
+        --------
+        Matrices of identical shapes
+        >>> x = ivy.array([[1., 2.], [3., 4.]])
+        >>> y = ivy.array([[5., 6.], [7., 8.]])
+        >>> d = x.inner(y)
+        >>> print(d)
+        ivy.array([[17., 23.], [39., 53.]])
+
+        # Matrices of different shapes
+        >>> x = ivy.array([[1., 2.], [3., 4.],[5., 6.]])
+        >>> y = ivy.array([[5., 6.], [7., 8.]])
+        >>> d = x.inner(y)
+        >>> print(d)
+        ivy.array([[17., 23.], [39., 53.], [61., 83.]])
+
+        # 3D matrices
+        >>> x = ivy.array([[[1., 2.], [3., 4.]],
+        ...                [[5., 6.], [7., 8.]]])
+        >>> y = ivy.array([[[9., 10.], [11., 12.]],
+        ...                [[13., 14.], [15., 16.]]])
+        >>> d = x.inner(y)
+        >>> print(d)
+        ivy.array([[[[ 29.,  35.], [ 41.,  47.]],
+                    [[ 67.,  81.], [ 95., 109.]]],
+                   [[[105., 127.], [149., 171.]],
+                    [[143., 173.], [203., 233.]]]])
+        """
         return ivy.inner(self._data, x2, out=out)
 
     def inv(
         self: ivy.Array, /, *, adjoint: bool = False, out: Optional[ivy.Array] = None
     ) -> ivy.Array:
-        """
-        ivy.Array instance method variant of ivy.inv. This method simply wraps the
-        function, and so the docstring for ivy.inv also applies to this method with
-        minimal changes.
+        """ivy.Array instance method variant of ivy.inv. This method simply
+        wraps the function, and so the docstring for ivy.inv also applies to
+        this method with minimal changes.
 
         Parameters
         ----------
@@ -407,10 +455,9 @@ class _ArrayWithLinearAlgebra(abc.ABC):
         keepdims: bool = False,
         out: Optional[ivy.Array] = None,
     ) -> ivy.Array:
-        """
-        ivy.Array instance method variant of ivy.matrix_norm. This method simply wraps
-        the function, and so the docstring for ivy.matrix_norm also applies to this
-        method with minimal changes.
+        """ivy.Array instance method variant of ivy.matrix_norm. This method
+        simply wraps the function, and so the docstring for ivy.matrix_norm
+        also applies to this method with minimal changes.
 
         Parameters
         ----------
@@ -442,7 +489,7 @@ class _ArrayWithLinearAlgebra(abc.ABC):
         ivy.array(6.3)
 
         >>> x = ivy.arange(8, dtype=float).reshape((2, 2, 2))
-        >>> y = x.matrix_norm(ord="nuc", axis=(2, 1), keepdims=True)
+        >>> y = x.matrix_norm(ord="nuc", keepdims=True)
         >>> print(y)
         ivy.array([[[ 4.24]],
                 [[11.4 ]]])
@@ -466,12 +513,12 @@ class _ArrayWithLinearAlgebra(abc.ABC):
         *,
         atol: Optional[Union[float, Tuple[float]]] = None,
         rtol: Optional[Union[float, Tuple[float]]] = None,
+        hermitian: Optional[bool] = False,
         out: Optional[ivy.Array] = None,
     ) -> ivy.Array:
-        """
-        ivy.Array instance method variant of ivy.matrix_rank. This method returns the
-        rank (i.e., number of non-zero singular values) of a matrix (or a stack of
-        matrices).
+        """ivy.Array instance method variant of ivy.matrix_rank. This method
+        returns the rank (i.e., number of non-zero singular values) of a matrix
+        (or a stack of matrices).
 
         Parameters
         ----------
@@ -494,6 +541,14 @@ class _ArrayWithLinearAlgebra(abc.ABC):
             be the machine epsilon associated with the floating-point data type
             determined by :ref:`type-promotion` (as applied to ``x``).
             Default: ``None``.
+
+        hermitian
+            indicates whether ``x`` is Hermitian. When ``hermitian=True``, ``x`` is
+            assumed to be Hermitian, enabling a more efficient method for finding
+            eigenvalues, but x is not checked inside the function. Instead, We just use
+            the lower triangular of the matrix to compute.
+            Default: ``False``.
+
         out
             optional output array, for writing the result to. It must have a shape that
             the inputs broadcast to.
@@ -527,13 +582,14 @@ class _ArrayWithLinearAlgebra(abc.ABC):
         >>> ivy.matrix_rank(x)
         ivy.array(0)
         """
-        return ivy.matrix_rank(self._data, atol=atol, rtol=rtol, out=out)
+        return ivy.matrix_rank(
+            self._data, atol=atol, rtol=rtol, hermitian=hermitian, out=out
+        )
 
     def matrix_transpose(
         self: ivy.Array, /, *, conjugate: bool = False, out: Optional[ivy.Array] = None
     ) -> ivy.Array:
-        """
-        Transpose a matrix (or a stack of matrices) ``x``.
+        """Transpose a matrix (or a stack of matrices) ``x``.
 
         Parameters
         ----------
@@ -570,8 +626,7 @@ class _ArrayWithLinearAlgebra(abc.ABC):
         *,
         out: Optional[ivy.Array] = None,
     ) -> ivy.Array:
-        """
-        Compute the outer product between two arrays.
+        """Compute the outer product between two arrays.
 
         Parameters
         ----------
@@ -607,10 +662,9 @@ class _ArrayWithLinearAlgebra(abc.ABC):
         rtol: Optional[Union[float, Tuple[float]]] = None,
         out: Optional[ivy.Array] = None,
     ) -> ivy.Array:
-        """
-        ivy.Array instance method variant of ivy.pinv. This method simply wraps the
-        function, and so the docstring for ivy.pinv also applies to this method with
-        minimal changes.
+        """ivy.Array instance method variant of ivy.pinv. This method simply
+        wraps the function, and so the docstring for ivy.pinv also applies to
+        this method with minimal changes.
 
         Parameters
         ----------
@@ -633,15 +687,15 @@ class _ArrayWithLinearAlgebra(abc.ABC):
         >>> x = ivy.array([[1., 2.], [3., 4.]])
         >>> y = x.pinv()
         >>> print(y)
-        ivy.array([[-2., 1.],
-                   [1.5, -0.5]])
+        ivy.array([[-1.99999988,  1.        ],
+               [ 1.5       , -0.5       ]])
 
         >>> x = ivy.array([[1., 2.], [3., 4.]])
         >>> z = ivy.zeros((2,2))
         >>> x.pinv(rtol=0, out=z)
         >>> print(z)
-        ivy.array([[0.0426, 0.0964],
-                   [0.0605, 0.1368]])
+        ivy.array([[-1.99999988,  1.        ],
+               [ 1.5       , -0.5       ]])
         """
         return ivy.pinv(self._data, rtol=rtol, out=out)
 
@@ -652,10 +706,9 @@ class _ArrayWithLinearAlgebra(abc.ABC):
         mode: str = "reduced",
         out: Optional[Tuple[ivy.Array, ivy.Array]] = None,
     ) -> Tuple[ivy.Array, ivy.Array]:
-        """
-        ivy.Array instance method variant of ivy.qr. This method simply wraps the
-        function, and so the docstring for ivy.qr also applies to this method with
-        minimal changes.
+        """ivy.Array instance method variant of ivy.qr. This method simply
+        wraps the function, and so the docstring for ivy.qr also applies to
+        this method with minimal changes.
 
         Returns the qr decomposition x = QR of a full column rank matrix (or a stack of
         matrices), where Q is an orthonormal matrix (or a stack of matrices) and R is an
@@ -693,16 +746,28 @@ class _ArrayWithLinearAlgebra(abc.ABC):
             is 'complete', the array must have shape (..., M, N). If mode is 'reduced',
             the array must have shape (..., K, N), where K = min(M, N). The first
             x.ndim-2 dimensions must have the same size as those of the input x.
+
+        Examples
+        --------
+        >>> x = ivy.array([[1.,2.,3.],[4.,5.,6.],[7.,8.,9.]])
+        >>> q, r = x.qr(mode='reduced')
+        >>> print(q)
+        ivy.array([[-0.12309149,  0.90453403,  0.40824829],
+            [-0.49236596,  0.30151134, -0.81649658],
+            [-0.86164044, -0.30151134,  0.40824829]])
+        >>> print(r)
+        ivy.array([[-8.12403841e+00,-9.60113630e+00, -1.10782342e+01],
+            [ 0.00000000e+00,  9.04534034e-01,  1.80906807e+00],
+            [ 0.00000000e+00,  0.00000000e+00, -8.88178420e-16]])
         """
         return ivy.qr(self._data, mode=mode, out=out)
 
     def slogdet(
         self: ivy.Array,
     ) -> Tuple[ivy.Array, ivy.Array]:
-        """
-        ivy.Array instance method variant of ivy.slogdet. This method simply wraps the
-        function, and so the docstring for ivy.slogdet also applies to this method with
-        minimal changes.
+        """ivy.Array instance method variant of ivy.slogdet. This method simply
+        wraps the function, and so the docstring for ivy.slogdet also applies
+        to this method with minimal changes.
 
         Parameters
         ----------
@@ -728,7 +793,7 @@ class _ArrayWithLinearAlgebra(abc.ABC):
         ...                [3.0, 4.0]])
         >>> y = x.slogdet()
         >>> print(y)
-        slogdet(sign=ivy.array(-1.), logabsdet=ivy.array(0.6931472))
+        slogdet(sign=ivy.array(-1.), logabsdet=ivy.array(0.69314718))
 
         >>> x = ivy.array([[1.2, 2.0, 3.1],
         ...                [6.0, 5.2, 4.0],
@@ -756,10 +821,9 @@ class _ArrayWithLinearAlgebra(abc.ABC):
         compute_uv: bool = True,
         full_matrices: bool = True,
     ) -> Union[ivy.Array, Tuple[ivy.Array, ...]]:
-        """
-        ivy.Array instance method variant of ivy.svf. This method simply wraps the
-        function, and so the docstring for ivy.svd also applies to this method with
-        minimal changes.
+        """ivy.Array instance method variant of ivy.svf. This method simply
+        wraps the function, and so the docstring for ivy.svd also applies to
+        this method with minimal changes.
 
         Parameters
         ----------
@@ -844,9 +908,9 @@ class _ArrayWithLinearAlgebra(abc.ABC):
         axis2: int = 1,
         out: Optional[ivy.Array] = None,
     ) -> ivy.Array:
-        """
-        ivy.Array instance method variant of ivy.trace. This method Returns the sum
-        along the specified diagonals of a matrix (or a stack of matrices).
+        """ivy.Array instance method variant of ivy.trace. This method Returns
+        the sum along the specified diagonals of a matrix (or a stack of
+        matrices).
 
         Parameters
         ----------
@@ -856,6 +920,14 @@ class _ArrayWithLinearAlgebra(abc.ABC):
         offset
             Offset of the diagonal from the main diagonal. Can be both positive and
             negative. Defaults to 0.
+        axis1
+            axis to be used as the first axis of the 2-D sub-arrays from which the
+            diagonals should be taken.
+            Defaults to ``0.`` .
+        axis2
+            axis to be used as the second axis of the 2-D sub-arrays from which the
+            diagonals should be taken.
+            Defaults to ``1.`` .
         out
             optional output array, for writing the result to. It must have a shape that
             the inputs broadcast to.
@@ -908,9 +980,8 @@ class _ArrayWithLinearAlgebra(abc.ABC):
         dtype: Optional[Union[ivy.Dtype, ivy.NativeDtype]] = None,
         out: Optional[ivy.Array] = None,
     ) -> ivy.Array:
-        """
-        ivy.Array instance method variant of ivy.vector_norm. This method computes the
-        vector norm of a vector (or batch of vectors).
+        """ivy.Array instance method variant of ivy.vector_norm. This method
+        computes the vector norm of a vector (or batch of vectors).
 
         Parameters
         ----------
@@ -1001,9 +1072,8 @@ class _ArrayWithLinearAlgebra(abc.ABC):
         increasing: bool = False,
         out: Optional[ivy.Array] = None,
     ) -> ivy.Array:
-        """
-        ivy.Array instance method variant of ivy.vander. This method Returns the
-        Vandermonde matrix of the input array.
+        """ivy.Array instance method variant of ivy.vander. This method Returns
+        the Vandermonde matrix of the input array.
 
         Parameters
         ----------

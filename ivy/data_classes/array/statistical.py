@@ -15,10 +15,11 @@ class _ArrayWithStatistical(abc.ABC):
         *,
         axis: Optional[Union[int, Sequence[int]]] = None,
         keepdims: bool = False,
+        initial: Optional[Union[int, float, complex]] = None,
+        where: Optional[ivy.Array] = None,
         out: Optional[ivy.Array] = None,
     ) -> ivy.Array:
-        """
-        Calculate the minimum value of the input array ``x``.
+        """Calculate the minimum value of the input array ``x``.
 
         Parameters
         ----------
@@ -37,6 +38,11 @@ class _ArrayWithStatistical(abc.ABC):
             array (see :ref:`broadcasting`). Otherwise, if ``False``, the
             reduced axes (dimensions) must not be included in the
             result. Default: ``False``.
+        initial
+            The maximum value of an output element.
+            Must be present to allow computation on empty slice.
+        where
+            Elements to compare for minimum
         out
             optional output array, for writing the result to.
 
@@ -68,9 +74,15 @@ class _ArrayWithStatistical(abc.ABC):
         >>> x.min(out=y)
         >>> print(y)
         ivy.array(0.1)
-
         """
-        return ivy.min(self._data, axis=axis, keepdims=keepdims, out=out)
+        return ivy.min(
+            self._data,
+            axis=axis,
+            keepdims=keepdims,
+            initial=initial,
+            where=where,
+            out=out,
+        )
 
     def max(
         self: ivy.Array,
@@ -80,10 +92,9 @@ class _ArrayWithStatistical(abc.ABC):
         keepdims: bool = False,
         out: Optional[ivy.Array] = None,
     ) -> ivy.Array:
-        """
-        ivy.Array instance method variant of ivy.max. This method simply wraps the
-        function, and so the docstring for ivy.max also applies to this method with
-        minimal changes.
+        """ivy.Array instance method variant of ivy.max. This method simply
+        wraps the function, and so the docstring for ivy.max also applies to
+        this method with minimal changes.
 
         Parameters
         ----------
@@ -123,7 +134,7 @@ class _ArrayWithStatistical(abc.ABC):
         ivy.array(3)
 
         >>> x = ivy.array([0, 1, 2])
-        >>> z = ivy.array([0])
+        >>> z = ivy.array(0)
         >>> y = x.max(out=z)
         >>> print(z)
         ivy.array(2)
@@ -143,10 +154,9 @@ class _ArrayWithStatistical(abc.ABC):
         keepdims: bool = False,
         out: Optional[ivy.Array] = None,
     ) -> ivy.Array:
-        """
-        ivy.Array instance method variant of ivy.mean. This method simply wraps the
-        function, and so the docstring for ivy.mean also applies to this method with
-        minimal changes.
+        """ivy.Array instance method variant of ivy.mean. This method simply
+        wraps the function, and so the docstring for ivy.mean also applies to
+        this method with minimal changes.
 
         **Special Cases**
 
@@ -191,7 +201,7 @@ class _ArrayWithStatistical(abc.ABC):
         >>> print(y)
         ivy.array(4.)
 
-        >>> x = ivy.array([-1, 0, 1])
+        >>> x = ivy.array([-1., 0., 1.])
         >>> y = ivy.mean(x)
         >>> print(y)
         ivy.array(0.)
@@ -209,7 +219,7 @@ class _ArrayWithStatistical(abc.ABC):
         ivy.array(1.)
 
         >>> x = ivy.array([[-0.5, 1., 2.], [0.0, 1.1, 2.2]])
-        >>> y = ivy.array([0., 0., 0.])
+        >>> y = ivy.zeros((1, 3))
         >>> x.mean(axis=0, keepdims=True, out=y)
         >>> print(y)
         ivy.array([[-0.25      ,  1.04999995,  2.0999999 ]])
@@ -231,10 +241,9 @@ class _ArrayWithStatistical(abc.ABC):
         keepdims: bool = False,
         out: Optional[ivy.Array] = None,
     ) -> ivy.Array:
-        """
-        ivy.Array instance method variant of ivy.var. This method simply wraps the
-        function, and so the docstring for ivy.var also applies to this method with
-        minimal changes.
+        """ivy.Array instance method variant of ivy.var. This method simply
+        wraps the function, and so the docstring for ivy.var also applies to
+        this method with minimal changes.
 
         **Special Cases**
 
@@ -317,10 +326,9 @@ class _ArrayWithStatistical(abc.ABC):
         dtype: Optional[Union[ivy.Dtype, ivy.NativeDtype]] = None,
         out: Optional[ivy.Array] = None,
     ) -> ivy.Array:
-        """
-        ivy.array instance method variant of ivy.prod. This method simply wraps the
-        function, and so the docstring for ivy.prod also applies to this method with
-        minimal changes.
+        """ivy.array instance method variant of ivy.prod. This method simply
+        wraps the function, and so the docstring for ivy.prod also applies to
+        this method with minimal changes.
 
         Parameters
         ----------
@@ -403,10 +411,9 @@ class _ArrayWithStatistical(abc.ABC):
         keepdims: bool = False,
         out: Optional[ivy.Array] = None,
     ) -> ivy.Array:
-        """
-        ivy.array instance method variant of ivy.std. This method simply wraps the
-        function, and so the docstring for ivy.std also applies to this method with
-        minimal changes.
+        """ivy.array instance method variant of ivy.std. This method simply
+        wraps the function, and so the docstring for ivy.std also applies to
+        this method with minimal changes.
 
         Parameters
         ----------
@@ -459,7 +466,7 @@ class _ArrayWithStatistical(abc.ABC):
         >>> x = ivy.array([-1., 0., 1.])
         >>> y = x.std()
         >>> print(y)
-        ivy.array(0.8164966)
+        ivy.array(0.81649661)
 
         >>> x = ivy.array([-1., 0., 1.])
         >>> z = x.std(correction=1)
@@ -480,7 +487,7 @@ class _ArrayWithStatistical(abc.ABC):
         >>> x = ivy.array([[-1., -2.], [3., 3.]])
         >>> y = x.std(axis=1)
         >>> print(y)
-        ivy.array([1.5, 1. ])
+        ivy.array([0.5, 0. ])
         """
         return ivy.std(
             self, axis=axis, correction=correction, keepdims=keepdims, out=out
@@ -498,10 +505,9 @@ class _ArrayWithStatistical(abc.ABC):
         dtype: Optional[Union[ivy.Dtype, ivy.NativeDtype]] = None,
         out: Optional[ivy.Array] = None,
     ) -> ivy.Array:
-        """
-        ivy.Array instance method variant of ivy.cumsum. This method simply wraps the
-        function, and so the docstring for ivy.cumsum also applies to this method with
-        minimal changes.
+        """ivy.Array instance method variant of ivy.cumsum. This method simply
+        wraps the function, and so the docstring for ivy.cumsum also applies to
+        this method with minimal changes.
 
         Parameters
         ----------
@@ -573,10 +579,9 @@ class _ArrayWithStatistical(abc.ABC):
         dtype: Optional[Union[ivy.Dtype, ivy.NativeDtype]] = None,
         out: Optional[ivy.Array] = None,
     ) -> ivy.Array:
-        """
-        ivy.Array instance method variant of ivy.cumprod. This method simply wraps the
-        function, and so the docstring for ivy.cumprod also applies to this method with
-        minimal changes.
+        """ivy.Array instance method variant of ivy.cumprod. This method simply
+        wraps the function, and so the docstring for ivy.cumprod also applies
+        to this method with minimal changes.
 
         Parameters
         ----------
@@ -638,152 +643,15 @@ class _ArrayWithStatistical(abc.ABC):
             out=out,
         )
 
-    def cummax(
-        self: ivy.Array,
-        /,
-        *,
-        axis: int = 0,
-        exclusive: bool = False,
-        reverse: bool = False,
-        out: Optional[ivy.Array] = None,
-    ) -> ivy.Array:
-        """
-        ivy.Array instance method variant of ivy.cummax. This method simply wraps the
-        function, and so the docstring for ivy.cummax also applies to this method with
-        minimal changes.
-
-        Parameters
-        ----------
-        self
-            input array
-        axis
-            int, axis along which to take the cumulative maximum. Default is ``0``.
-        reverse
-            Whether to perform the cummax from last to first element in the selected
-            axis. Default is ``False`` (from first to last element)
-        dtype
-            data type of the returned array. If None, if the default data type
-            corresponding to the data type “kind” (integer or floating-point) of x
-            has a smaller range of values than the data type of x (e.g., x has data
-            type int64 and the default data type is int32, or x has data type uint64
-            and the default data type is int64), the returned array must have the
-            same data type as x. if x has a floating-point data type, the returned array
-            must have the default floating-point data type. if x has a signed integer
-            data type (e.g., int16), the returned array must have the default integer
-            data type. if x has an unsigned integer data type (e.g., uint16), the
-            returned array must have an unsigned integer data type having the same
-            number of bits as the default integer data type (e.g., if the default
-            integer data type is int32, the returned array must have a uint32 data
-            type). If the data type (either specified or resolved) differs from the
-            data type of x, the input array should be cast to the specified data type
-            before computing the product. Default: ``None``.
-        out
-            optional output array, for writing the result to.
-
-        Returns
-        -------
-        ret
-            Input array with cumulatively multiplied elements along the specified axis.
-        --------
-        >>> x = ivy.array([1, 2, 5, 4, 3])
-        >>> y = x.cummax()
-        >>> print(y)
-        ivy.array([1, 2, 5, 5, 5])
-
-        >>> x = ivy.array([[2, 3], [5, 7], [11, 13]])
-        >>> y = ivy.zeros((3, 2), dtype="int32")
-        >>> x.cummax(axis=1, reverse=True, out=y)
-        >>> print(y)
-        ivy.array([[ 3,  3],
-                  [ 7,  7],
-                  [13, 13]])
-        """
-        return ivy.cummax(
-            self._data,
-            axis=axis,
-            exclusive=exclusive,
-            reverse=reverse,
-            out=out,
-        )
-
-    def cummin(
-        self: ivy.Array,
-        /,
-        *,
-        axis: int = 0,
-        reverse: bool = False,
-        dtype: Optional[Union[ivy.Dtype, ivy.NativeDtype]] = None,
-        out: Optional[ivy.Array] = None,
-    ) -> ivy.Array:
-        """
-        ivy.Array instance method variant of ivy.cummin. This method simply wraps the
-        function, and so the docstring for ivy.cummin also applies to this method with
-        minimal changes.
-
-        Parameters
-        ----------
-        self
-            input array
-        axis
-            int, axis along which to take the cumulative minimum. Default is ``0``.
-        reverse
-            Whether to perform the cummin from last to first element in the selected
-            axis. Default is ``False`` (from first to last element)
-        dtype
-            data type of the returned array. If None, if the default data type
-            corresponding to the data type “kind” (integer or floating-point) of x
-            has a smaller range of values than the data type of x (e.g., x has data
-            type int64 and the default data type is int32, or x has data type uint64
-            and the default data type is int64), the returned array must have the
-            same data type as x. if x has a floating-point data type, the returned array
-            must have the default floating-point data type. if x has a signed integer
-            data type (e.g., int16), the returned array must have the default integer
-            data type. if x has an unsigned integer data type (e.g., uint16), the
-            returned array must have an unsigned integer data type having the same
-            number of bits as the default integer data type (e.g., if the default
-            integer data type is int32, the returned array must have a uint32 data
-            type). If the data type (either specified or resolved) differs from the
-            data type of x, the input array should be cast to the specified data type
-            before computing the product. Default: ``None``.
-        out
-            optional output array, for writing the result to.
-
-        Returns
-        -------
-        ret
-            Input array with cumulatively multiplied elements along the specified axis.
-        --------
-        >>> x = ivy.array([1, 2, 3, 4, 5])
-        >>> y = x.cummin()
-        >>> print(y)
-        ivy.array([1, 1, 1, 1, 1])
-
-        >>> x = ivy.array([[2, 3], [5, 7], [11, 13]])
-        >>> y = ivy.zeros((3, 2), dtype="int32")
-        >>> x.cummin(axis=1, reverse=True, out=y)
-        >>> print(y)
-        ivy.array([[ 2,  3],
-                  [ 5,  7],
-                  [11, 13]])
-        """
-        return ivy.cummin(
-            self._data,
-            axis=axis,
-            reverse=reverse,
-            dtype=dtype,
-            out=out,
-        )
-
     def einsum(
         self: ivy.Array,
         equation: str,
         *operands: Union[ivy.Array, ivy.NativeArray],
         out: Optional[ivy.Array] = None,
     ) -> ivy.Array:
-        """
-        ivy.Array instance method variant of ivy.einsum. This method simply wraps the
-        function, and so the docstring for ivy.einsum also applies to this method with
-        minimal changes.
+        """ivy.Array instance method variant of ivy.einsum. This method simply
+        wraps the function, and so the docstring for ivy.einsum also applies to
+        this method with minimal changes.
 
         Parameters
         ----------

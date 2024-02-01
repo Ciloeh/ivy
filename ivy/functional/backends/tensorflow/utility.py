@@ -3,6 +3,10 @@ import tensorflow as tf
 from typing import Union, Optional, Sequence
 
 
+# local
+import ivy
+
+
 def all(
     x: Union[tf.Tensor, tf.Variable],
     /,
@@ -11,13 +15,15 @@ def all(
     keepdims: bool = False,
     out: Optional[Union[tf.Tensor, tf.Variable]] = None,
 ) -> Union[tf.Tensor, tf.Variable]:
-    x = tf.constant(x)
     if axis is None:
         num_dims = len(x.shape)
         axis = tuple(range(num_dims))
     elif isinstance(axis, list):
         axis = tuple(axis)
-    return tf.reduce_all(tf.cast(x, tf.bool), axis=axis, keepdims=keepdims)
+    try:
+        return tf.reduce_all(tf.cast(x, tf.bool), axis=axis, keepdims=keepdims)
+    except tf.errors.InvalidArgumentError as e:
+        raise ivy.utils.exceptions.IvyIndexError(e) from e
 
 
 def any(
@@ -28,10 +34,12 @@ def any(
     keepdims: bool = False,
     out: Optional[Union[tf.Tensor, tf.Variable]] = None,
 ) -> Union[tf.Tensor, tf.Variable]:
-    x = tf.constant(x)
     if axis is None:
         num_dims = len(x.shape)
         axis = tuple(range(num_dims))
     elif isinstance(axis, list):
         axis = tuple(axis)
-    return tf.reduce_any(tf.cast(x, tf.bool), axis=axis, keepdims=keepdims)
+    try:
+        return tf.reduce_any(tf.cast(x, tf.bool), axis=axis, keepdims=keepdims)
+    except tf.errors.InvalidArgumentError as e:
+        raise ivy.utils.exceptions.IvyIndexError(e) from e

@@ -240,6 +240,16 @@ def floor_divide(
     return mx.nd.floor(mx.nd.divide(x1, x2))
 
 
+def fmin(
+    x1: Union[(None, mx.ndarray.NDArray)],
+    x2: Union[(None, mx.ndarray.NDArray)],
+    /,
+    *,
+    out: Optional[Union[(None, mx.ndarray.NDArray)]] = None,
+) -> Union[(None, mx.ndarray.NDArray)]:
+    raise IvyNotImplementedException()
+
+
 def greater(
     x1: Union[(float, None, mx.ndarray.NDArray)],
     x2: Union[(float, None, mx.ndarray.NDArray)],
@@ -365,6 +375,16 @@ def logaddexp(
     return mx.nd.logaddexp(x1, x2)
 
 
+def logaddexp2(
+    x1: Union[(None, mx.ndarray.NDArray, float, list, tuple)],
+    x2: Union[(None, mx.ndarray.NDArray, float, list, tuple)],
+    /,
+    *,
+    out: Optional[Union[(None, mx.ndarray.NDArray)]] = None,
+) -> Union[(None, mx.ndarray.NDArray)]:
+    raise IvyNotImplementedException()
+
+
 def logical_and(
     x1: Union[(None, mx.ndarray.NDArray)],
     x2: Union[(None, mx.ndarray.NDArray)],
@@ -443,8 +463,8 @@ def positive(
 
 
 def pow(
-    x1: Union[(float, None, mx.ndarray.NDArray)],
-    x2: Union[(float, None, mx.ndarray.NDArray)],
+    x1: Union[(None, mx.ndarray.NDArray)],
+    x2: Union[(int, float, None, mx.ndarray.NDArray)],
     /,
     *,
     out: Optional[Union[(None, mx.ndarray.NDArray)]] = None,
@@ -553,6 +573,18 @@ def subtract(
     return mx.nd.subtract(x1, x2)
 
 
+def trapz(
+    y: Union[(None, mx.ndarray.NDArray)],
+    /,
+    *,
+    x: Optional[Union[(None, mx.ndarray.NDArray)]] = None,
+    dx: float = 1.0,
+    axis: int = (-1),
+    out: Optional[Union[(None, mx.ndarray.NDArray)]] = None,
+) -> Union[(None, mx.ndarray.NDArray)]:
+    raise IvyNotImplementedException()
+
+
 def tan(
     x: Union[(None, mx.ndarray.NDArray)],
     /,
@@ -566,6 +598,7 @@ def tanh(
     x: Union[(None, mx.ndarray.NDArray)],
     /,
     *,
+    complex_mode="jax",
     out: Optional[Union[(None, mx.ndarray.NDArray)]] = None,
 ) -> Union[(None, mx.ndarray.NDArray)]:
     return mx.nd.tanh(x)
@@ -573,6 +606,34 @@ def tanh(
 
 def trunc(
     x: Union[(None, mx.ndarray.NDArray)],
+    /,
+    *,
+    out: Optional[Union[(None, mx.ndarray.NDArray)]] = None,
+) -> Union[(None, mx.ndarray.NDArray)]:
+    raise IvyNotImplementedException()
+
+
+def imag(
+    val: Union[(None, mx.ndarray.NDArray)],
+    /,
+    *,
+    out: Optional[Union[(None, mx.ndarray.NDArray)]] = None,
+) -> Union[(None, mx.ndarray.NDArray)]:
+    raise IvyNotImplementedException()
+
+
+def angle(
+    input: Union[(None, mx.ndarray.NDArray)],
+    /,
+    *,
+    deg: Optional[bool] = None,
+    out: Optional[Union[(None, mx.ndarray.NDArray)]] = None,
+) -> Union[(None, mx.ndarray.NDArray)]:
+    raise IvyNotImplementedException()
+
+
+def exp2(
+    x: Union[(None, mx.ndarray.NDArray, float, list, tuple)],
     /,
     *,
     out: Optional[Union[(None, mx.ndarray.NDArray)]] = None,
@@ -650,6 +711,15 @@ def isreal(
 def fmod(
     x1: Union[(None, mx.ndarray.NDArray)],
     x2: Union[(None, mx.ndarray.NDArray)],
+    /,
+    *,
+    out: Optional[Union[(None, mx.ndarray.NDArray)]] = None,
+) -> Union[(None, mx.ndarray.NDArray)]:
+    raise IvyNotImplementedException()
+
+
+def real(
+    x: Union[(None, mx.ndarray.NDArray)],
     /,
     *,
     out: Optional[Union[(None, mx.ndarray.NDArray)]] = None,

@@ -32,10 +32,9 @@ class _ArrayWithManipulation(abc.ABC):
         axis: int = 0,
         out: Optional[ivy.Array] = None,
     ) -> ivy.Array:
-        """
-        ivy.Array instance method variant of ivy.concat. This method simply wraps the
-        function, and so the docstring for ivy.concat also applies to this method with
-        minimal changes.
+        """ivy.Array instance method variant of ivy.concat. This method simply
+        wraps the function, and so the docstring for ivy.concat also applies to
+        this method with minimal changes.
 
         Parameters
         ----------
@@ -69,10 +68,9 @@ class _ArrayWithManipulation(abc.ABC):
         axis: Union[int, Sequence[int]] = 0,
         out: Optional[ivy.Array] = None,
     ) -> ivy.Array:
-        """
-        ivy.Array instance method variant of ivy.expand_dims. This method simply wraps
-        the function, and so the docstring for ivy.expand_dims also applies to this
-        method with minimal changes.
+        """ivy.Array instance method variant of ivy.expand_dims. This method
+        simply wraps the function, and so the docstring for ivy.expand_dims
+        also applies to this method with minimal changes.
 
         Parameters
         ----------
@@ -82,6 +80,12 @@ class _ArrayWithManipulation(abc.ABC):
             position in the expanded array where a new axis (dimension) of size one
             will be added. If array ``self`` has the rank of ``N``, the ``axis`` needs
             to be between ``[-N-1, N]``. Default: ``0``.
+        copy
+            boolean indicating whether or not to copy the input array.
+            If True, the function must always copy.
+            If False, the function must never copy.
+            In case copy is False we avoid copying by returning
+            a view of the input array.
         out
             optional output array, for writing the result to. It must have a shape
             that the inputs broadcast to.
@@ -110,10 +114,9 @@ class _ArrayWithManipulation(abc.ABC):
         axis: Optional[Union[int, Sequence[int]]] = None,
         out: Optional[ivy.Array] = None,
     ) -> ivy.Array:
-        """
-        ivy.Array instance method variant of ivy.flip. This method simply wraps the
-        function, and so the docstring for ivy.flip also applies to this method with
-        minimal changes.
+        """ivy.Array instance method variant of ivy.flip. This method simply
+        wraps the function, and so the docstring for ivy.flip also applies to
+        this method with minimal changes.
 
         Parameters
         ----------
@@ -124,6 +127,12 @@ class _ArrayWithManipulation(abc.ABC):
             input array axes are flipped. If axis is negative, axis
             is counted from the last dimension. If provided more than
             one axis, only the specified axes. Default: None.
+        copy
+            boolean indicating whether or not to copy the input array.
+            If True, the function must always copy.
+            If False, the function must never copy.
+            In case copy is False we avoid copying by returning
+             a view of the input array.
         out
             optional output array, for writing the result to.
             It must have a shape that the inputs broadcast to.
@@ -158,10 +167,9 @@ class _ArrayWithManipulation(abc.ABC):
         copy: Optional[bool] = None,
         out: Optional[ivy.Array] = None,
     ) -> ivy.Array:
-        """
-        ivy.Array instance method variant of ivy.permute_dims. This method simply wraps
-        the function, and so the docstring for ivy.permute_dims also applies to this
-        method with minimal changes.
+        """ivy.Array instance method variant of ivy.permute_dims. This method
+        simply wraps the function, and so the docstring for ivy.permute_dims
+        also applies to this method with minimal changes.
 
         Parameters
         ----------
@@ -170,6 +178,12 @@ class _ArrayWithManipulation(abc.ABC):
         axes
             tuple containing a permutation of (0, 1, ..., N-1) where N is
             the number of axes (dimensions) of x.
+        copy
+            boolean indicating whether or not to copy the input array.
+            If True, the function must always copy.
+            If False, the function must never copy.
+            In case copy is False we avoid copying by returning
+            a view of the input array.
         out
             optional output array, for writing the result to. It must have a
             shape that the inputs broadcast to.
@@ -211,10 +225,9 @@ class _ArrayWithManipulation(abc.ABC):
         allowzero: bool = True,
         out: Optional[ivy.Array] = None,
     ) -> ivy.Array:
-        """
-        ivy.Array instance method variant of ivy.reshape. This method simply wraps the
-        function, and so the docstring for ivy.reshape also applies to this method with
-        minimal changes.
+        """ivy.Array instance method variant of ivy.reshape. This method simply
+        wraps the function, and so the docstring for ivy.reshape also applies
+        to this method with minimal changes.
 
         Parameters
         ----------
@@ -227,10 +240,9 @@ class _ArrayWithManipulation(abc.ABC):
         copy
             boolean indicating whether or not to copy the input array.
             If True, the function must always copy.
-            If False, the function must never copy and must
-            raise a ValueError in case a copy would be necessary.
-            If None, the function must reuse existing memory buffer if possible
-            and copy otherwise. Default: ``None``.
+            If False, the function must never copy.
+            In case copy is False we avoid copying by returning
+             a view of the input array.
         order
             Read the elements of the input array using this index order,
             and place the elements into the reshaped array using this index order.
@@ -280,10 +292,9 @@ class _ArrayWithManipulation(abc.ABC):
         axis: Optional[Union[int, Sequence[int]]] = None,
         out: Optional[ivy.Array] = None,
     ) -> ivy.Array:
-        """
-        ivy.Array instance method variant of ivy.roll. This method simply wraps the
-        function, and so the docstring for ivy.roll also applies to this method with
-        minimal changes.
+        """ivy.Array instance method variant of ivy.roll. This method simply
+        wraps the function, and so the docstring for ivy.roll also applies to
+        this method with minimal changes.
 
         Parameters
         ----------
@@ -332,20 +343,43 @@ class _ArrayWithManipulation(abc.ABC):
     def squeeze(
         self: ivy.Array,
         /,
-        axis: Union[int, Sequence[int]],
         *,
+        axis: Optional[Union[int, Sequence[int]]],
         copy: Optional[bool] = None,
         out: Optional[ivy.Array] = None,
     ) -> ivy.Array:
-        """
-        ivy.Array instance method variant of ivy.squeeze. This method simply wraps the
-        function, and so the docstring for ivy.squeeze also applies to this method with
-        minimal changes.
+        """ivy.Array instance method variant of ivy.squeeze. This method simply
+        wraps the function, and so the docstring for ivy.squeeze also applies
+        to this method with minimal changes.
+
+        Parameters
+        ----------
+        self
+            input array.
+        axis
+            axis (or axes) to squeeze. If a specified axis has a size greater than one,
+            a ValueError is. If None, then all squeezable axes are squeezed.
+            Default: ``None``.
+        copy
+            boolean indicating whether or not to copy the input array.
+            If True, the function must always copy.
+            If False, the function must never copy.
+            In case copy is False we avoid copying by returning
+             a view of the input array.
+        out
+            optional output array, for writing the result to.
+            It must have a shape that the inputs broadcast to.
+
+        Returns
+        -------
+        ret
+            an output array having the same data type and elements as x.
+
 
         Examples
         --------
         >>> x = ivy.array([[[0.],[ 1.]]])
-        >>> y = x.squeeze(2)
+        >>> y = x.squeeze(axis=2)
         >>> print(y)
         ivy.array([[0., 1.]])
         """
@@ -362,10 +396,9 @@ class _ArrayWithManipulation(abc.ABC):
         axis: int = 0,
         out: Optional[ivy.Array] = None,
     ) -> ivy.Array:
-        """
-        ivy.Array instance method variant of ivy.stack. This method simply wraps the
-        function, and so the docstring for ivy.stack also applies to this method with
-        minimal changes.
+        """ivy.Array instance method variant of ivy.stack. This method simply
+        wraps the function, and so the docstring for ivy.stack also applies to
+        this method with minimal changes.
 
         Parameters
         ----------
@@ -407,16 +440,15 @@ class _ArrayWithManipulation(abc.ABC):
 
     def clip(
         self: ivy.Array,
-        x_min: Union[Number, ivy.Array, ivy.NativeArray],
-        x_max: Union[Number, ivy.Array, ivy.NativeArray],
         /,
+        x_min: Optional[Union[Number, ivy.Array, ivy.NativeArray]] = None,
+        x_max: Optional[Union[Number, ivy.Array, ivy.NativeArray]] = None,
         *,
         out: Optional[ivy.Array] = None,
     ) -> ivy.Array:
-        """
-        ivy.Array instance method variant of ivy.clip. This method simply wraps the
-        function, and so the docstring for ivy.clip also applies to this method with
-        minimal changes.
+        """ivy.Array instance method variant of ivy.clip. This method simply
+        wraps the function, and so the docstring for ivy.clip also applies to
+        this method with minimal changes.
 
         Parameters
         ----------
@@ -453,10 +485,9 @@ class _ArrayWithManipulation(abc.ABC):
         value: Number = 0,
         out: Optional[ivy.Array] = None,
     ) -> ivy.Array:
-        """
-        ivy.Array instance method variant of ivy.constant_pad. This method simply wraps
-        the function, and so the docstring for ivy.constant_pad also applies to this
-        method with minimal changes.
+        """ivy.Array instance method variant of ivy.constant_pad. This method
+        simply wraps the function, and so the docstring for ivy.constant_pad
+        also applies to this method with minimal changes.
 
         Parameters
         ----------
@@ -495,10 +526,9 @@ class _ArrayWithManipulation(abc.ABC):
         axis: Optional[Union[int, Sequence[int]]] = None,
         out: Optional[ivy.Array] = None,
     ) -> ivy.Array:
-        """
-        ivy.Array instance method variant of ivy.repeat. This method simply wraps the
-        function, and so the docstring for ivy.repeat also applies to this method with
-        minimal changes.
+        """ivy.Array instance method variant of ivy.repeat. This method simply
+        wraps the function, and so the docstring for ivy.repeat also applies to
+        this method with minimal changes.
 
         Parameters
         ----------
@@ -534,23 +564,31 @@ class _ArrayWithManipulation(abc.ABC):
         /,
         *,
         copy: Optional[bool] = None,
-        num_or_size_splits: Optional[Union[int, Sequence[int]]] = None,
+        num_or_size_splits: Optional[
+            Union[int, Sequence[int], ivy.Array, ivy.NativeArray]
+        ] = None,
         axis: int = 0,
         with_remainder: bool = False,
     ) -> List[ivy.Array]:
-        """
-        ivy.Array instance method variant of ivy.split. This method simply wraps the
-        function, and so the docstring for ivy.split also applies to this method with
-        minimal changes.
+        """ivy.Array instance method variant of ivy.split. This method simply
+        wraps the function, and so the docstring for ivy.split also applies to
+        this method with minimal changes.
 
         Parameters
         ----------
         self
             array to be divided into sub-arrays.
+        copy
+            boolean indicating whether or not to copy the input array.
+            If True, the function must always copy.
+            If False, the function must never copy.
+            In case copy is False we avoid copying by returning
+            a view of the input array.
         num_or_size_splits
             Number of equal arrays to divide the array into along the given axis if an
-            integer. The size of each split element if a sequence of integers. Default
-            is to divide into as many 1-dimensional arrays as the axis dimension.
+            integer. The size of each split element if a sequence of integers or
+            1-D array. Default is to divide into as many 1-dimensional arrays
+            as the axis dimension.
         axis
             The axis along which to split, default is ``0``.
         with_remainder
@@ -586,10 +624,9 @@ class _ArrayWithManipulation(abc.ABC):
         copy: Optional[bool] = None,
         out: Optional[ivy.Array] = None,
     ) -> ivy.Array:
-        """
-        ivy.Array instance method variant of ivy.swap_axes. This method simply wraps the
-        function, and so the docstring for ivy.split also applies to this method with
-        minimal changes.
+        """ivy.Array instance method variant of ivy.swap_axes. This method
+        simply wraps the function, and so the docstring for ivy.split also
+        applies to this method with minimal changes.
 
         Parameters
         ----------
@@ -599,6 +636,12 @@ class _ArrayWithManipulation(abc.ABC):
             First axis to be swapped.
         axis1
             Second axis to be swapped.
+        copy
+            boolean indicating whether or not to copy the input array.
+            If True, the function must always copy.
+            If False, the function must never copy.
+            In case copy is False we avoid copying by returning
+             a view of the input array.
         out
             optional output array, for writing the result to. It must have a
             shape that the inputs broadcast to.
@@ -636,10 +679,9 @@ class _ArrayWithManipulation(abc.ABC):
         *,
         out: Optional[ivy.Array] = None,
     ) -> ivy.Array:
-        """
-        ivy.Array instance method variant of ivy.tile. This method simply wraps the
-        function, and so the docstring for ivy.tile also applies to this method with
-        minimal changes.
+        """ivy.Array instance method variant of ivy.tile. This method simply
+        wraps the function, and so the docstring for ivy.tile also applies to
+        this method with minimal changes.
 
         Parameters
         ----------
@@ -682,15 +724,20 @@ class _ArrayWithManipulation(abc.ABC):
         axis: int = 0,
         keepdims: bool = False,
     ) -> ivy.Array:
-        """
-        ivy.Array instance method variant of ivy.unstack. This method simply wraps the
-        function, and so the docstring for ivy.unstack also applies to this method with
-        minimal changes.
+        """ivy.Array instance method variant of ivy.unstack. This method simply
+        wraps the function, and so the docstring for ivy.unstack also applies
+        to this method with minimal changes.
 
         Parameters
         ----------
         self
             Input array to unstack.
+        copy
+            boolean indicating whether or not to copy the input array.
+            If True, the function must always copy.
+            If False, the function must never copy.
+            In case copy is False we avoid copying by returning
+             a view of the input array.
         axis
             Axis for which to unpack the array.
         keepdims
@@ -724,10 +771,9 @@ class _ArrayWithManipulation(abc.ABC):
         *,
         out: Optional[ivy.Array] = None,
     ) -> ivy.Array:
-        """
-        ivy.Array instance method variant of ivy.zero_pad. This method simply wraps the
-        function, and so the docstring for ivy.zero_pad also applies to this method with
-        minimal changes.
+        """ivy.Array instance method variant of ivy.zero_pad. This method
+        simply wraps the function, and so the docstring for ivy.zero_pad also
+        applies to this method with minimal changes.
 
         Parameters
         ----------
